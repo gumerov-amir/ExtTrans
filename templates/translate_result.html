@@ -1,0 +1,2 @@
+<p>{{ result }}</p>
+<p aria-live="off">{% for item in items %}<a href="{{ item["link"] }}" target="_blank" title="{% if not item["exist"] %}non-{% endif %}Existing Wiktionary entry">{{ item["word"] }}</a>{% endfor %}</p>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ExtTrans</title>
+</head>
+
+<body>
+    <form id="translation_form">
+        <p>
+            <label>Source: </label>
+            <select id="source">
+                {% for language in languages %}
+                    <option value="{{ languages[language] }}">{{ language }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <input type="button" id="swap_button" value="Swap" onclick="swap">
+        </p>
+        <p>
+            <label>Target: </label>
+            <select id="target">
+                {% for language in languages %}
+                    <option value="{{ languages[language] }}">{{ language }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label>Text: </label>
+            <input type="text" id="text" value="{{ text }}"">
+    </p>
+    <p>
+        <input type="submit" value="translate">
+        </p>
+    </form>
+    <div id="translation" aria-live="assertive"></div>
+</body>
+<script>
+    function translate(event=false) {
+        var url = `http://localhost:8000/translate/?source=${source_elem.value}&target=${target_elem.value}&text=${text_elem.value}`;
+        fetch(url).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (json_data) {
+                    document.getElementById("translation").innerHTML = json_data["html"];
+                    result = json_data["result"];
+                });
+            }
+        });
+        history.replaceState(null, null, `/?source=${source_elem.value}&target=${target_elem.value}&text=${text_elem.value}`);
+        if (event) {
+            event.preventDefault();
+        }
+    }
+
+    function swap() {
+        translate();
+        [source_elem.value, target_elem.value] = [target_elem.value, source_elem.value];
+        text_elem.value = result;
+        translate();
+    }
+
+    var source_elem = document.getElementById("source");
+    source_elem.value = "{{ source }}";
+    var target_elem = document.getElementById("target");
+    target_elem.value = "{{ target }}";
+    var text_elem = document.getElementById("text");
+    var result = ""
+    document.getElementById("translation_form").addEventListener("submit", translate);
+    document.getElementById("swap_button").onclick = swap;
+</script>
+
+</html>
